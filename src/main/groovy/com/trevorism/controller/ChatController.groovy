@@ -9,6 +9,7 @@ import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure
 import com.trevorism.service.ChatConverter
 import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.swagger.v3.oas.annotations.Operation
@@ -23,7 +24,7 @@ class ChatController {
     @Operation(summary = "Send a chat message and get a response")
     @Post(value = "/", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER)
-    ChatResponse chat(ChatRequest request) {
+    ChatResponse chat(@Body ChatRequest request) {
         OpenAiResponse response = openAiClient.chat(ChatConverter.convert(request))
         ChatConverter.convert(response)
     }
