@@ -4,8 +4,6 @@ import com.google.gson.Gson
 import com.trevorism.http.HeadersHttpResponse
 import com.trevorism.http.HttpClient
 import com.trevorism.http.JsonHttpClient
-import com.trevorism.https.SecureHttpClient
-import com.trevorism.https.SecureHttpClientBase
 import com.trevorism.https.token.ObtainTokenFromPropertiesFile
 import com.trevorism.openai.model.OpenAiRequest
 import com.trevorism.openai.model.OpenAiResponse
