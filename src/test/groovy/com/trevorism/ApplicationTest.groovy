@@ -1,9 +1,11 @@
 package com.trevorism
 
 import io.micronaut.runtime.EmbeddedApplication
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Test
 
+@MicronautTest
 class ApplicationTest {
 
     @Inject
@@ -11,7 +13,7 @@ class ApplicationTest {
 
     @Test
     void 'test it works'() {
-        assert true
+        assert application
     }
 
 }

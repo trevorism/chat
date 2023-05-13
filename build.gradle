@@ -59,7 +59,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:2.0.6'
 
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.trevorism:micronaut-security-utils:0.5.0'
+    implementation 'com.trevorism:micronaut-security-utils:0.7.1'
     implementation 'com.trevorism:secure-http-utils:2.1.0'
 
     acceptanceImplementation 'io.cucumber:cucumber-groovy:6.10.4'
@@ -88,6 +88,6 @@ appengine {
     stage.artifact = "${buildDir}/libs/${project.name}-all.jar"
     deploy {
         projectId = "trevorism-action"
-        version = "0-1-0"
+        version = "0-2-0"
     }
 }
