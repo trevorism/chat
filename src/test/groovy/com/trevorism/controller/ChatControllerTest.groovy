@@ -2,6 +2,7 @@ package com.trevorism.controller
 
 import com.trevorism.model.ChatRequest
 import com.trevorism.model.ChatResponse
+import com.trevorism.openai.DefaultOpenAiClient
 import com.trevorism.openai.OpenAiClient
 import com.trevorism.openai.model.OpenAiMessage
 import com.trevorism.openai.model.OpenAiResponse
@@ -19,5 +20,6 @@ class ChatControllerTest {
 
         assert response.message == "hello"
     }
+
 }
 

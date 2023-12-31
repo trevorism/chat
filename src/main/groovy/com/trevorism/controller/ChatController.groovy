@@ -23,7 +23,7 @@ class ChatController {
     OpenAiClient openAiClient
 
     @Tag(name = "Chat Operations")
-    @Operation(summary = "Send a chat message and get a response")
+    @Operation(summary = "Send a chat message and get a response **Secure")
     @Post(value = "/", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER)
     ChatResponse chat(@Body ChatRequest request) {
