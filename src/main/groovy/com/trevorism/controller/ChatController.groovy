@@ -14,11 +14,13 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.inject.Inject
 
 @Controller("/api/chat")
 class ChatController {
 
-    OpenAiClient openAiClient = new DefaultOpenAiClient()
+    @Inject
+    OpenAiClient openAiClient
 
     @Tag(name = "Chat Operations")
     @Operation(summary = "Send a chat message and get a response")

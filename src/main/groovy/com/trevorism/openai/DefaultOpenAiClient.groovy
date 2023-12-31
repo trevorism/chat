@@ -8,6 +8,7 @@ import com.trevorism.https.token.ObtainTokenFromPropertiesFile
 import com.trevorism.openai.model.OpenAiRequest
 import com.trevorism.openai.model.OpenAiResponse
 
+@jakarta.inject.Singleton
 class DefaultOpenAiClient implements OpenAiClient {
 
     private HttpClient httpClient = new JsonHttpClient()

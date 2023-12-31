@@ -1,6 +1,6 @@
 package com.trevorism.openai.model
 
 class OpenAiRequest {
-    String model = "gpt-3.5-turbo"
+    String model = "gpt-4"
     List<OpenAiMessage> messages = []
 }
