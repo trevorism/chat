@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.info.Info
         info = @Info(
                 title = "Chat",
                 version = "0.2.0",
-                description = "API that wraps Chat-GPT",
+                description = "API that wraps the OpenAI API",
                 contact = @Contact(url = "https://trevorism.com", name = "Trevor Brooks", email = "tbrooks@trevorism.com")
         )
 )
