@@ -10,7 +10,9 @@ class ChatConverter {
 
     static OpenAiRequest convert(ChatRequest chatRequest){
         OpenAiRequest openAiRequest = new OpenAiRequest()
-
+        if(chatRequest.model){
+            openAiRequest.model = chatRequest.model
+        }
         if(chatRequest.context){
             openAiRequest.messages << new OpenAiMessage(role: OpenAiMessage.ROLE_SYSTEM, content: chatRequest.context)
         }
