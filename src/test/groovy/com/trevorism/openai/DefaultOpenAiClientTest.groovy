@@ -3,6 +3,7 @@ package com.trevorism.openai
 import com.google.gson.Gson
 import com.trevorism.http.HeadersHttpResponse
 import com.trevorism.http.HttpClient
+import com.trevorism.https.token.ObtainTokenStrategy
 import com.trevorism.openai.model.OpenAiMessage
 import com.trevorism.openai.model.OpenAiRequest
 import com.trevorism.openai.model.OpenAiResponse
@@ -20,10 +21,11 @@ class DefaultOpenAiClientTest {
         String json = gson.toJson(mockResponse)
 
         client.httpClient = [post : { String url, String body, Map headers -> return new HeadersHttpResponse(json, [:]) }] as HttpClient
+        client.obtainTokenFromPropertiesFile = [getToken : { -> "xyz"} ] as ObtainTokenStrategy
+
         def result = client.chat(new OpenAiRequest())
         assert result
         assert result.choices
         assert result.choices[0].message.content == "hello"
-
     }
 }
