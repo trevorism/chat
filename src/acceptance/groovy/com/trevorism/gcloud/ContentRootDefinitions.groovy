@@ -10,7 +10,7 @@ this.metaClass.mixin(io.cucumber.groovy.EN)
 def contextRootContent
 def pingContent
 
-Given(~/^the auth application is alive$/) { ->
+Given(~/^the chat application is alive$/) { ->
     try{
         new URL("https://chat.action.trevorism.com/ping").text
     }
