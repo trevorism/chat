@@ -1,3 +1,7 @@
+## 0.5.0
+
+Update dependencies.
+
 ## 0.4.0
 
 Make the default model gpt-4o-mini now that it is available. Update dependencies.
