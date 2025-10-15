@@ -23,7 +23,7 @@ class DefaultOpenAiClientTest {
         client.httpClient = [post : { String url, String body, Map headers -> return new HeadersHttpResponse(json, [:]) }] as HttpClient
         client.obtainTokenFromPropertiesFile = [getToken : { -> "xyz"} ] as ObtainTokenStrategy
 
-        def result = client.chat(new OpenAiRequest())
+        def result = client.chat(new OpenAiRequest(messages: [new OpenAiMessage(role: "user", content: "hi")]))
         assert result
         assert result.choices
         assert result.choices[0].message.content == "hello"

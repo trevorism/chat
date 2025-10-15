@@ -1,3 +1,7 @@
+## 0.6.0
+
+Update dependencies, migrate to java 21, and make chat gpt 5 the default model.
+
 ## 0.5.0
 
 Update dependencies.

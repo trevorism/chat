@@ -29,4 +29,5 @@ class ChatController {
         OpenAiResponse response = openAiClient.chat(ChatConverter.convert(request))
         ChatConverter.convert(response)
     }
+
 }
