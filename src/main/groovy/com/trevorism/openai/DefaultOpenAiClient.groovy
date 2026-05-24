@@ -8,10 +8,13 @@ import com.trevorism.https.token.ObtainTokenFromPropertiesFile
 import com.trevorism.https.token.ObtainTokenStrategy
 import com.trevorism.openai.model.OpenAiRequest
 import com.trevorism.openai.model.OpenAiResponse
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @jakarta.inject.Singleton
 class DefaultOpenAiClient implements OpenAiClient {
 
+    private static final Logger log = LoggerFactory.getLogger(DefaultOpenAiClient)
     private HttpClient httpClient = new JsonHttpClient()
     private Gson gson = new Gson()
     private ObtainTokenStrategy obtainTokenFromPropertiesFile = new ObtainTokenFromPropertiesFile()
@@ -21,6 +24,7 @@ class DefaultOpenAiClient implements OpenAiClient {
         String requestJson = gson.toJson(request)
         Map authHeader = ["Authorization":"Bearer ${obtainTokenFromPropertiesFile.getToken()}"]
         HeadersHttpResponse response = httpClient.post("${OPENAI_BASE_URL}/chat/completions", requestJson, authHeader)
+        log.debug("OpenAI response: ${response.value}")
         String responseJson = response.value
         return gson.fromJson(responseJson, OpenAiResponse)
     }
