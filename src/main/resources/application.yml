@@ -6,7 +6,7 @@ micronaut:
     cors:
       enabled: true
   security:
-    enabled: false
+    enabled: true
     redirect:
       enabled: false
   router:
