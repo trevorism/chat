@@ -1,12 +1,10 @@
 package com.trevorism.controller
 
+import com.trevorism.chat.ChatProviderResolver
 import com.trevorism.model.ChatRequest
 import com.trevorism.model.ChatResponse
-import com.trevorism.openai.OpenAiClient
-import com.trevorism.openai.model.OpenAiResponse
 import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure
-import com.trevorism.service.ChatConverter
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
@@ -19,15 +17,14 @@ import jakarta.inject.Inject
 class ChatController {
 
     @Inject
-    OpenAiClient openAiClient
+    ChatProviderResolver chatProviderResolver
 
     @Tag(name = "Chat Operations")
-    @Operation(summary = "Send a chat message and get a response **Secure")
+    @Operation(summary = "Send a chat message and get a response. A 'claude' model routes to Claude, any other model routes to OpenAI **Secure")
     @Post(value = "/", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER)
     ChatResponse chat(@Body ChatRequest request) {
-        OpenAiResponse response = openAiClient.chat(ChatConverter.convert(request))
-        ChatConverter.convert(response)
+        chatProviderResolver.resolve(request.model).chat(request)
     }
 
 }
