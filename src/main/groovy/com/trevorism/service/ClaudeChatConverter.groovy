@@ -15,7 +15,7 @@ class ClaudeChatConverter {
     static ClaudeRequest convert(ChatRequest chatRequest){
         ClaudeRequest claudeRequest = new ClaudeRequest()
         if(chatRequest.model){
-            claudeRequest.model = chatRequest.model
+            claudeRequest.model = chatRequest.model.toLowerCase()
         }
         if(thinkingCannotBeDisabled(claudeRequest.model)){
             claudeRequest.thinking = null

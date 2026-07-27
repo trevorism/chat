@@ -49,6 +49,7 @@ class ClaudeChatConverterTest {
     @Test
     void testConvertRequestOmitsThinkingForMythos() {
         ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: "Claude-Mythos-5"))
+        assert claudeRequest.model == "claude-mythos-5"
         assert claudeRequest.thinking == null
         assert claudeRequest.max_tokens == 16000
     }
