@@ -1,3 +1,7 @@
+## 0.8.0
+
+Route chat requests to either OpenAI or Claude based on the requested model. A model starting with 'claude' goes to the Anthropic Messages API, anything else continues to OpenAI with the gpt-5.4 default. Prior messages now replay as user/assistant turns instead of user/system.
+
 ## 0.7.0
 
 Upgrade to Micronaut 5.0.0, Java 25, and latest dependencies (Gradle 9.x, shadow 9.4.1, reactor-core 3.8.5, gson 2.14.0, secure-http-utils 3.2.1, appengine-gradle-plugin 2.8.7).

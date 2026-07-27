@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.info.Info
 @OpenAPIDefinition(
         info = @Info(
                 title = "Chat",
-                version = "0.7.0",
-                description = "API that wraps the OpenAI API",
+                version = "0.8.0",
+                description = "API that wraps large language models",
                 contact = @Contact(url = "https://trevorism.com", name = "Trevor Brooks", email = "tbrooks@trevorism.com")
         )
 )

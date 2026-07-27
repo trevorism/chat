@@ -6,7 +6,7 @@ import com.trevorism.openai.model.OpenAiMessage
 import com.trevorism.openai.model.OpenAiRequest
 import com.trevorism.openai.model.OpenAiResponse
 
-class ChatConverter {
+class OpenAiChatConverter {
 
     static OpenAiRequest convert(ChatRequest chatRequest){
         OpenAiRequest openAiRequest = new OpenAiRequest()
@@ -18,7 +18,7 @@ class ChatConverter {
         }
         if(chatRequest.previousMessages){
             chatRequest.previousMessages.eachWithIndex { message, index ->
-                String role = index % 2 == 0 ? OpenAiMessage.ROLE_USER : OpenAiMessage.ROLE_SYSTEM
+                String role = index % 2 == 0 ? OpenAiMessage.ROLE_USER : OpenAiMessage.ROLE_ASSISTANT
                 openAiRequest.messages << new OpenAiMessage(role: role, content: message)
             }
         }
