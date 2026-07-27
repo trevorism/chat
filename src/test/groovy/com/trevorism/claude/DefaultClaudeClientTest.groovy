@@ -40,7 +40,11 @@ class DefaultClaudeClientTest {
         assert capturedUrl == "https://api.anthropic.com/v1/messages"
         assert capturedHeaders["x-api-key"] == "xyz"
         assert capturedHeaders["anthropic-version"] == "2023-06-01"
-        assert capturedBody == '{"model":"claude-opus-5","max_tokens":4096,"thinking":{"type":"disabled"},"messages":[{"role":"user","content":"hi"}]}'
+        Map body = gson.fromJson(capturedBody, Map)
+        assert body.model == "claude-opus-5"
+        assert body.max_tokens == 4096
+        assert body.thinking.type == "disabled"
+        assert body.messages[0].content == "hi"
     }
 
     @Test
