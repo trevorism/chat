@@ -1,3 +1,7 @@
+## 0.8.1
+
+Fix a 400 from Anthropic on claude-fable and claude-mythos models, which reject the thinking parameter because thinking is always on. Those models now omit thinking and use a larger max_tokens so an adaptive-thinking response is not truncated. Every other claude model continues to disable thinking.
+
 ## 0.8.0
 
 Route chat requests to either OpenAI or Claude based on the requested model. A model starting with 'claude' goes to the Anthropic Messages API, anything else continues to OpenAI with the gpt-5.4 default. Prior messages now replay as user/assistant turns instead of user/system.

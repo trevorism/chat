@@ -62,4 +62,22 @@ class DefaultClaudeClientTest {
 
         assert capturedBody == '{"model":"claude-opus-5","max_tokens":4096,"thinking":{"type":"disabled"},"system":"be brief","messages":[{"role":"user","content":"hi"}]}'
     }
+
+    @Test
+    void testChatOmitsThinkingWhenNull() {
+        DefaultClaudeClient client = new DefaultClaudeClient()
+        String capturedBody = null
+
+        client.httpClient = [post: { String url, String body, Map headers ->
+            capturedBody = body
+            return new HeadersHttpResponse(new Gson().toJson(new ClaudeResponse(content: [new ClaudeContent(type: "text", text: "hello")])), [:])
+        }] as HttpClient
+        client.obtainTokenFromPropertiesFile = [getToken: { -> "xyz" }] as ObtainTokenStrategy
+
+        client.chat(new ClaudeRequest(model: "claude-fable-5", max_tokens: 16000, thinking: null,
+                messages: [new ClaudeMessage(role: "user", content: "hi")]))
+
+        assert !capturedBody.contains("thinking")
+        assert capturedBody == '{"model":"claude-fable-5","max_tokens":16000,"messages":[{"role":"user","content":"hi"}]}'
+    }
 }
