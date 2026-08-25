@@ -39,6 +39,31 @@ class ClaudeChatConverterTest {
     }
 
     @Test
+    void testConvertRequestOmitsThinkingForFable() {
+        ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: "claude-fable-5"))
+        assert claudeRequest.model == "claude-fable-5"
+        assert claudeRequest.thinking == null
+        assert claudeRequest.max_tokens == 16000
+    }
+
+    @Test
+    void testConvertRequestOmitsThinkingForMythos() {
+        ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: "Claude-Mythos-5"))
+        assert claudeRequest.model == "claude-mythos-5"
+        assert claudeRequest.thinking == null
+        assert claudeRequest.max_tokens == 16000
+    }
+
+    @Test
+    void testConvertRequestDisablesThinkingForOtherModels() {
+        ["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5", "claude-opus-4-8"].each { model ->
+            ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: model))
+            assert claudeRequest.thinking.type == "disabled"
+            assert claudeRequest.max_tokens == 4096
+        }
+    }
+
+    @Test
     void testConvertRequestMergesConsecutiveUserMessages() {
         ChatRequest chatRequest = new ChatRequest(previousMessages: ["first ask"], message: "second ask")
         ClaudeRequest claudeRequest = ClaudeChatConverter.convert(chatRequest)
