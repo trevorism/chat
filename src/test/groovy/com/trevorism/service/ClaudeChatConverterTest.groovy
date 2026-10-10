@@ -6,16 +6,18 @@ import com.trevorism.claude.model.ClaudeRequest
 import com.trevorism.claude.model.ClaudeResponse
 import com.trevorism.model.ChatRequest
 import com.trevorism.model.ChatResponse
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
 import org.junit.jupiter.api.Test
 
 class ClaudeChatConverterTest {
 
     @Test
     void testConvertRequest() {
-        ChatRequest chatRequest = new ChatRequest(context: "as a crazy person", previousMessages: ["I am a crazy person", "That sounds hard"], message: "What will happen to me?", model: "claude-sonnet-5")
+        ChatRequest chatRequest = new ChatRequest(context: "as a crazy person", previousMessages: ["I am a crazy person", "That sounds hard"], message: "What will happen to me?", model: "claude-sonnet-5-5")
         ClaudeRequest claudeRequest = ClaudeChatConverter.convert(chatRequest)
         assert claudeRequest
-        assert claudeRequest.model == "claude-sonnet-5"
+        assert claudeRequest.model == "claude-sonnet-5-5"
         assert claudeRequest.system == "as a crazy person"
         assert claudeRequest.messages.size() == 3
         assert claudeRequest.messages[0].role == ClaudeMessage.ROLE_USER
@@ -29,9 +31,11 @@ class ClaudeChatConverterTest {
     @Test
     void testConvertRequestUsesDefaults() {
         ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi"))
-        assert claudeRequest.model == "claude-opus-5"
-        assert claudeRequest.max_tokens == 4096
-        assert claudeRequest.thinking.type == "disabled"
+        assert claudeRequest.model == "claude-opus-5-5"
+        assert claudeRequest.max_tokens == 16000
+        assert claudeRequest.thinking.type == "adaptive"
+        assert claudeRequest.output_config.effort == "low"
+        assert claudeRequest.fallbacks == "default"
         assert !claudeRequest.system
         assert claudeRequest.messages.size() == 1
         assert claudeRequest.messages[0].role == ClaudeMessage.ROLE_USER
@@ -39,27 +43,34 @@ class ClaudeChatConverterTest {
     }
 
     @Test
-    void testConvertRequestOmitsThinkingForFable() {
-        ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: "claude-fable-5"))
-        assert claudeRequest.model == "claude-fable-5"
+    void testConvertRequestUsesAdaptiveThinkingForCurrentModels() {
+        ["claude-opus-5-5", "claude-sonnet-5-5", "Claude-Fable-5-1"].each { model ->
+            ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: model, effort: "High"))
+            assert claudeRequest.model == model.toLowerCase()
+            assert claudeRequest.thinking.type == "adaptive"
+            assert claudeRequest.output_config.effort == "high"
+            assert claudeRequest.fallbacks == "default"
+        }
+    }
+
+    @Test
+    void testConvertRequestOmitsThinkingEffortAndFallbacksForHaiku() {
+        ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: "claude-haiku-4-5", effort: "max"))
+        assert claudeRequest.model == "claude-haiku-4-5"
         assert claudeRequest.thinking == null
+        assert claudeRequest.output_config == null
+        assert claudeRequest.fallbacks == null
         assert claudeRequest.max_tokens == 16000
     }
 
     @Test
-    void testConvertRequestOmitsThinkingForMythos() {
-        ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: "Claude-Mythos-5"))
-        assert claudeRequest.model == "claude-mythos-5"
-        assert claudeRequest.thinking == null
-        assert claudeRequest.max_tokens == 16000
-    }
-
-    @Test
-    void testConvertRequestDisablesThinkingForOtherModels() {
-        ["claude-opus-5", "claude-sonnet-5", "claude-haiku-4-5", "claude-opus-4-8"].each { model ->
-            ClaudeRequest claudeRequest = ClaudeChatConverter.convert(new ChatRequest(message: "hi", model: model))
-            assert claudeRequest.thinking.type == "disabled"
-            assert claudeRequest.max_tokens == 4096
+    void testConvertRequestRejectsUnknownEffort() {
+        try {
+            ClaudeChatConverter.convert(new ChatRequest(message: "hi", effort: "extreme"))
+            assert false
+        }
+        catch (HttpStatusException e) {
+            assert e.status == HttpStatus.BAD_REQUEST
         }
     }
 
@@ -74,27 +85,48 @@ class ClaudeChatConverterTest {
 
     @Test
     void testConvertResponse() {
-        def mockResponse = new ClaudeResponse(content: [new ClaudeContent(type: "text", text: "hello")])
+        def mockResponse = new ClaudeResponse(model: "claude-opus-5-5", stop_reason: "end_turn", content: [new ClaudeContent(type: "text", text: "hello")])
         ChatResponse response = ClaudeChatConverter.convert(mockResponse)
-        assert response
         assert response.message == "hello"
+        assert response.model == "claude-opus-5-5"
     }
 
     @Test
-    void testConvertResponseSkipsNonTextContent() {
-        def mockResponse = new ClaudeResponse(content: [new ClaudeContent(type: "thinking"), new ClaudeContent(type: "text", text: "hello")])
+    void testConvertResponseSkipsNonTextContentAndJoinsText() {
+        def mockResponse = new ClaudeResponse(content: [new ClaudeContent(type: "thinking"), new ClaudeContent(type: "fallback"),
+                new ClaudeContent(type: "text", text: "hel"), new ClaudeContent(type: "text", text: "lo")])
         assert ClaudeChatConverter.convert(mockResponse).message == "hello"
     }
 
     @Test
-    void testConvertResponseWithoutTextFails() {
-        def mockResponse = new ClaudeResponse(stop_reason: "refusal", content: [])
+    void testConvertResponseReportsFallbackModel() {
+        def mockResponse = new ClaudeResponse(model: "claude-opus-4-8", content: [new ClaudeContent(type: "text", text: "hello")])
+        assert ClaudeChatConverter.convert(mockResponse).model == "claude-opus-4-8"
+    }
+
+    @Test
+    void testConvertRefusalIsUnprocessable() {
+        def mockResponse = new ClaudeResponse(stop_reason: "refusal", stop_details: [type: "refusal", category: "cyber"], content: [])
         try {
             ClaudeChatConverter.convert(mockResponse)
             assert false
         }
-        catch (IllegalStateException e) {
-            assert e.message.contains("refusal")
+        catch (HttpStatusException e) {
+            assert e.status == HttpStatus.UNPROCESSABLE_ENTITY
+            assert e.message.contains("cyber")
+        }
+    }
+
+    @Test
+    void testConvertTruncatedResponseIsBadGateway() {
+        def mockResponse = new ClaudeResponse(stop_reason: "max_tokens", content: [new ClaudeContent(type: "text", text: "partial")])
+        try {
+            ClaudeChatConverter.convert(mockResponse)
+            assert false
+        }
+        catch (HttpStatusException e) {
+            assert e.status == HttpStatus.BAD_GATEWAY
+            assert e.message.contains("max_tokens")
         }
     }
 
@@ -104,8 +136,8 @@ class ClaudeChatConverterTest {
             ClaudeChatConverter.convert(new ClaudeResponse())
             assert false
         }
-        catch (IllegalStateException e) {
-            assert e.message
+        catch (HttpStatusException e) {
+            assert e.status == HttpStatus.BAD_GATEWAY
         }
     }
 }

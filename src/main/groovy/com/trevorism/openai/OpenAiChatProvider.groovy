@@ -10,8 +10,15 @@ import jakarta.inject.Singleton
 @Singleton
 class OpenAiChatProvider implements ChatProvider {
 
+    public static final List<String> MODELS = ["gpt-6.1-sol", "gpt-6-astra", "gpt-6-luna"]
+
     @Inject
     OpenAiClient openAiClient
+
+    @Override
+    List<String> getModels() {
+        MODELS
+    }
 
     @Override
     ChatResponse chat(ChatRequest request) {

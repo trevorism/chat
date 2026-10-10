@@ -1,6 +1,7 @@
 package com.trevorism.gcloud
 
 import com.google.gson.Gson
+import com.trevorism.http.util.InvalidRequestException
 import com.trevorism.https.AppClientSecureHttpClient
 import com.trevorism.https.SecureHttpClient
 
@@ -12,6 +13,7 @@ Gson gson = new Gson()
 String baseUrl = System.getenv("ACCEPTANCE_BASE_URL") ?: "https://chat.action.trevorism.com"
 String prompt = "Reply with the single word: pong"
 String json
+int rejectedStatusCode
 
 def sendChat = { String requestJson ->
     try {
@@ -27,8 +29,18 @@ When(~/^I send a chat message with no model$/) { ->
     json = sendChat(gson.toJson([message: prompt]))
 }
 
-When(~/^I send a chat message using the "([^"]*)" model$/) { String model ->
-    json = sendChat(gson.toJson([message: prompt, model: model]))
+When(~/^I send a chat message using the "([^"]*)" model with "([^"]*)" effort$/) { String model, String effort ->
+    json = sendChat(gson.toJson([message: prompt, model: model, effort: effort]))
+}
+
+When(~/^I send a chat message using the unsupported "([^"]*)" model$/) { String model ->
+    try {
+        client.post("${baseUrl}/api/chat", gson.toJson([message: prompt, model: model]))
+        rejectedStatusCode = 200
+    }
+    catch (InvalidRequestException e) {
+        rejectedStatusCode = e.statusCode
+    }
 }
 
 Then(~/^a chat response with a message is returned$/) { ->
@@ -36,4 +48,13 @@ Then(~/^a chat response with a message is returned$/) { ->
     Map response = gson.fromJson(json, Map)
     assert response.message
     assert !response.message.trim().isEmpty()
+}
+
+Then(~/^the response was answered by "([^"]*)"$/) { String model ->
+    Map response = gson.fromJson(json, Map)
+    assert response.model.startsWith(model)
+}
+
+Then(~/^the request is rejected as a bad request$/) { ->
+    assert rejectedStatusCode == 400
 }
