@@ -20,7 +20,7 @@ class ChatController {
     ChatProviderResolver chatProviderResolver
 
     @Tag(name = "Chat Operations")
-    @Operation(summary = "Send a chat message and get a response. Supported OpenAI models route to the Responses API and supported Claude models to the Messages API; no model uses gpt-6.1-sol. effort is low, medium, high, xhigh, or max (default low) **Secure")
+    @Operation(summary = "Send a chat message and get a response. **Secure")
     @Post(value = "/", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER)
     ChatResponse chat(@Body ChatRequest request) {
