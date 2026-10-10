@@ -5,6 +5,8 @@ import com.trevorism.model.ChatResponse
 
 interface ChatProvider {
 
+    List<String> getModels()
+
     ChatResponse chat(ChatRequest request)
 
 }

@@ -1,7 +1,7 @@
 package com.trevorism.claude.model
 
 class ClaudeThinking {
-    public static String TYPE_DISABLED = "disabled"
+    public static String TYPE_ADAPTIVE = "adaptive"
 
-    String type = TYPE_DISABLED
+    String type = TYPE_ADAPTIVE
 }

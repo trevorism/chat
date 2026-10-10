@@ -13,11 +13,17 @@ class ClaudeChatProviderTest {
         ClaudeChatProvider provider = new ClaudeChatProvider()
         provider.claudeClient = { request ->
             assert request.messages[0].content == "What will happen to me?"
-            new ClaudeResponse(content: [new ClaudeContent(type: "text", text: "hello")])
+            new ClaudeResponse(model: "claude-opus-5-5", content: [new ClaudeContent(type: "text", text: "hello")])
         } as ClaudeClient
 
         ChatResponse response = provider.chat(new ChatRequest(message: "What will happen to me?"))
 
         assert response.message == "hello"
+        assert response.model == "claude-opus-5-5"
+    }
+
+    @Test
+    void testModels() {
+        assert new ClaudeChatProvider().models == ClaudeChatProvider.MODELS
     }
 }

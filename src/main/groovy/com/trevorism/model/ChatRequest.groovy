@@ -6,4 +6,5 @@ class ChatRequest {
     List<String> previousMessages
     String message
     String model
+    String effort
 }

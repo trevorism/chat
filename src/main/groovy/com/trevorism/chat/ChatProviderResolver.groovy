@@ -2,13 +2,13 @@ package com.trevorism.chat
 
 import com.trevorism.claude.ClaudeChatProvider
 import com.trevorism.openai.OpenAiChatProvider
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 
 @Singleton
 class ChatProviderResolver {
-
-    public static String CLAUDE_MODEL_PREFIX = "claude"
 
     @Inject
     ClaudeChatProvider claudeChatProvider
@@ -17,6 +17,15 @@ class ChatProviderResolver {
     OpenAiChatProvider openAiChatProvider
 
     ChatProvider resolve(String model) {
-        model?.toLowerCase()?.startsWith(CLAUDE_MODEL_PREFIX) ? claudeChatProvider : openAiChatProvider
+        if (!model) {
+            return openAiChatProvider
+        }
+        List<ChatProvider> providers = [openAiChatProvider, claudeChatProvider]
+        ChatProvider provider = providers.find { model.toLowerCase() in it.models }
+        if (!provider) {
+            String supportedModels = providers.collectMany { it.models }.join(", ")
+            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Unsupported model '${model}'. Supported models: ${supportedModels}")
+        }
+        return provider
     }
 }

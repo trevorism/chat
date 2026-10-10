@@ -1,3 +1,7 @@
+## 0.9.0
+
+Move OpenAI from Chat Completions to the Responses API (stateless, `store: false`) and adopt the current Claude request shape (adaptive thinking, `output_config.effort`, server-side refusal fallbacks). Requests take an optional `effort` (low, medium, high, xhigh, max; default low) and responses report the `model` that answered. Models are restricted to an allow-list: gpt-6.1-sol (default), gpt-6-astra, gpt-6-luna, claude-opus-5-5, claude-sonnet-5-5, claude-fable-5-1, claude-haiku-4-5; any other model returns 400. Provider errors now pass through with the provider's message, refusals return 422, and truncated or incomplete responses return 502.
+
 ## 0.8.2
 
 Update dependencies, fix gh actions workflow
