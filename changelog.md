@@ -1,3 +1,7 @@
+## 0.8.2
+
+Update dependencies, fix gh actions workflow
+
 ## 0.8.1
 
 Fix a 400 from Anthropic on claude-fable and claude-mythos models, which reject the thinking parameter because thinking is always on. Those models now omit thinking and use a larger max_tokens so an adaptive-thinking response is not truncated. Every other claude model continues to disable thinking.
